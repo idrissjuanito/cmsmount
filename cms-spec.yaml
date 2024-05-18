@@ -1,0 +1,596 @@
+openapi: 3.0.0
+info:
+  title: Headless cms api service
+  description: -|
+    API Spec for CMSMount headless CMS service.
+    Headless is intended for content management for frontend applications
+    Services will accept user registrations ad for each user to specify
+    domains for which it wants to manage content
+  version: "0.1"
+servers:
+  - url: api.cmsmount.co/v1
+tags:
+  - name: users
+    description: system users endpoints
+  - name: posts
+    description: blog post content type
+  - name: projects
+    description: portfolio projects content type
+  - name: account
+paths:
+  /users/registration:
+    post:
+      tags:
+        - users
+      description: Creates and stores new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  example: john
+                lastName:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  example: johndoe@gmail.com
+                password:
+                  type: string
+                  example: secrep)9@pass
+      responses:
+        "200":
+          description: registration succeeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: Logged in user email
+                  token:
+                    description: Logged in user's access token
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /users/login:
+    get:
+      tags:
+        - users
+      summary: Login user
+      description: authenticates a user by create a session
+      operationId: loginUser
+      responses:
+        "200":
+          description: sucessfull user login – returns email and access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: Logged in user email
+                  token:
+                    description: Logged in user's access token
+                    type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /users/logout:
+    get:
+      tags:
+        - users
+      summary: Logout User
+      description: logs user out by destroying a user session
+      operationId: logoutUser
+      responses:
+        "200":
+          description: User successfully logged out
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+      security:
+        - BearerAuth: []
+  /users:
+    get:
+      tags:
+        - users
+      description: gets the list of all users stored in the system
+      summary: only accessible by system admin
+      operationId: getAllUsers
+      responses:
+        "200":
+          description: All users successfully returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized access
+        "400":
+          description: Bad request from client
+      security:
+        - BearerAuth: []
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: gets a single users basic info
+      description: Get's basic information about a user
+      operationId: getUser
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: user found and info well retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+      security:
+        - BearerAuth: []
+    put:
+      tags:
+        - users
+      summary: Update user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        default:
+          description: successful operation
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - users
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "400":
+          description: Invalid username supplied
+        "401":
+          description: User Unauthorized
+        "404":
+          description: User not found
+      security:
+        - BearerAuth: []
+  /users/{userId}/settings:
+    get:
+      tags:
+        - users
+      summary: get user settings
+      description: retrieves data about the users preferences and settings
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: successfully retrieve user settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  allowedDomains:
+                    type: array
+                    items:
+                      type: string
+                  tokens:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          description: bad request
+        "401":
+          description: User unauthorized to perform action
+        "404":
+          description: User not found
+      security:
+        - BearerAuth: []
+  /content/posts:
+    get:
+      tags:
+        - posts
+      operationId: getAllPosts
+      summary: Get blog post
+      description: rettrieves all blog posts for project identified by api key
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageLimit"
+      responses:
+        "200":
+          description: successfull retrieval
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized access
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - posts
+      summary: New Project
+      description: adds a new project content for
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+      responses:
+        "201":
+          description: New post created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postId:
+                    type: string
+        "400":
+          description: Bad request missing fields
+        "401":
+          description: Unauthorized access
+        "500":
+          description: failed to create post server error
+      security:
+        - ApiKeyAuth: []
+  /content/posts/{postId}:
+    get:
+      tags:
+        - posts
+      summary: Get post
+      description: gets a single post data
+      operationId: getPost
+      parameters:
+        - $ref: "#/components/parameters/PostId"
+      responses:
+        "200":
+          description: successfull post retrieval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized access
+        "400":
+          description: Bad requestBody
+    put:
+      tags:
+        - posts
+      summary: Update a post
+      description: Updates single post data
+      operationId: updatePost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+      responses:
+        "200":
+          description: successfull response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  createAt:
+                    type: string
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+    delete:
+      tags:
+        - posts
+      summary: delete a post
+      description: deletes a single blog post
+      parameters:
+        - $ref: "#/components/schemas/Post"
+      responses:
+        "200":
+          description: successfully deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized access
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  /content/projects:
+    get:
+      tags:
+        - projects
+      summary: gets all projects for user
+      description: Getting projects content for identified project
+      operationId: getAllProjects
+      responses:
+        "200":
+          description: get success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - projects
+      summary: New Project
+      description: adds a new project content for
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Project"
+      responses:
+        "201":
+          description: Post was successufully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  projectId:
+                    type: string
+        "500":
+          description: create project failed  server error
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad request missing required data
+      security:
+        - ApiKeyAuth: []
+  /content/projects/{postId}:
+    get:
+      tags:
+        - projects
+      summary: Get project
+      description: gets a single project data
+      operationId: getProject
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: successfull Project retrieval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthorized access
+        "400":
+          description: Bad requestBody
+    put:
+      tags:
+        - projects
+      summary: Update a project
+      description: Updates single post data
+      operationId: updateProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Project"
+      responses:
+        "200":
+          description: successfull response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  createAt:
+                    type: string
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+    delete:
+      tags:
+        - projects
+      summary: delete a project
+      description: deletes a single project
+      parameters:
+        - $ref: "#/components/schemas/Post"
+      responses:
+        "200":
+          description: successfully deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized access
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          example: johndoe@gmail.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        role:
+          type: string
+          enum: [admin, subscriber]
+          description: User's role
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        author:
+          type: string
+        datePublished:
+          type: string
+        featuredImageUrl:
+          type: string
+        published:
+          type: boolean
+        featured:
+          type: boolean
+        categories:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        featured:
+          type: boolean
+        stack:
+          type: array
+          items:
+            type: string
+  parameters:
+    UserId:
+      name: userId
+      description: User's id
+      in: path
+      required: true
+      schema:
+        type: string
+    PageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: string
+    PageLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: string
+    PostId:
+      name: PostId
+      required: true
+      in: path
+      schema:
+        type: string
+    ProjectId:
+      name: ProjectId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    UnauthorizedError:
+      description: User unauthorized to access this ressource
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    NotFoundError:
+      description: Ressouce not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    ApiKeyAuth:
+      in: header
+      type: apiKey
+      name: X-API-KEY
+    BearerAuth:
+      type: http
+      scheme: bearer

@@ -16,7 +16,8 @@ tags:
     description: blog post content type
   - name: projects
     description: portfolio projects content type
-  - name: account
+  - name: applications
+    description: application/projects a user intends to use api on
 paths:
   /users/registration:
     post:
@@ -42,7 +43,7 @@ paths:
                   example: johndoe@gmail.com
                 password:
                   type: string
-                  example: secrep)9@pass
+                  example: secrep9@pass
       responses:
         "200":
           description: registration succeeded
@@ -182,36 +183,86 @@ paths:
           description: User not found
       security:
         - BearerAuth: []
-  /users/{userId}/settings:
+  /apps:
     get:
       tags:
-        - users
-      summary: get user settings
-      description: retrieves data about the users preferences and settings
-      parameters:
-        - $ref: "#/components/parameters/UserId"
+        - applications
+      summary: Gets all apps
+      description: retrieve all apps in the system admin only
       responses:
         "200":
-          description: successfully retrieve user settings
+          description: sucessfull retrieval
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  allowedDomains:
-                    type: array
-                    items:
-                      type: string
-                  tokens:
-                    type: array
-                    items:
-                      type: string
+                type: array
+                items:
+                  $ref: "#/components/schemas/App"
+        "401":
+          description: Unauthorized access
         "400":
           description: bad request
+      security:
+        - BearerAuth: []
+  /apps/{appId}:
+    get:
+      tags:
+        - applications
+      summary: get single app
+      description: retrives data on single app
+      parameters:
+        - $ref: "#/components/parameters/AppId"
+      responses:
+        "200":
+          description: sucess retrieval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
         "401":
-          description: User unauthorized to perform action
-        "404":
-          description: User not found
+          description: unauthorized access
+        "400":
+          description: bad request
+      security:
+        - BearerAuth: []
+    put:
+      tags:
+        - applications
+      summary: update an application
+      description: Updates a users application
+      parameters:
+        - $ref: "#/components/parameters/AppId"
+      responses:
+        "200":
+          description: update successfull
+          content:
+            text/plain:
+              schema:
+                type: string
+        "401":
+          description: unauthorized access
+        "400":
+          description: bad request
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - applications
+      summary: delete applicationn
+      description: deletes a single app and all its associated keys
+      parameters:
+        - $ref: "#/components/parameters/AppId"
+      responses:
+        "200":
+          description: successfully deleted
+          content:
+            text/plain:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized access
+        "400":
+          description: Bad request
       security:
         - BearerAuth: []
   /content/posts:
@@ -288,6 +339,8 @@ paths:
           description: Unauthorized access
         "400":
           description: Bad requestBody
+      security:
+        - ApiKeyAuth: []
     put:
       tags:
         - posts
@@ -409,6 +462,8 @@ paths:
           description: Unauthorized access
         "400":
           description: Bad requestBody
+      security:
+        - ApiKeyAuth: []
     put:
       tags:
         - projects
@@ -484,6 +539,9 @@ components:
       properties:
         id:
           type: string
+        appId:
+          type: string
+          format: appId
         title:
           type: string
         body:
@@ -511,6 +569,9 @@ components:
       properties:
         id:
           type: string
+        appId:
+          type: string
+          format: uuid
         title:
           type: string
         description:
@@ -523,6 +584,32 @@ components:
           type: array
           items:
             type: string
+    App:
+      type: object
+      properties:
+        appId:
+          type: string
+          format: uuid
+        keys:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApiKey"
+        userId:
+          type: string
+          format: uuid
+    ApiKey:
+      type: object
+      properties:
+        key:
+          type: string
+        status:
+          enum:
+            - active
+            - revoked
+        appId:
+          type: string
+          format: uuid
+
   parameters:
     UserId:
       name: userId
@@ -555,6 +642,13 @@ components:
       required: true
       schema:
         type: string
+    AppId:
+      name: appId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   responses:
     UnauthorizedError:
       description: User unauthorized to access this ressource

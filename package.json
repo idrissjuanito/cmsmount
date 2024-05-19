@@ -1,0 +1,33 @@
+{
+  "name": "cmsmount",
+  "version": "1.0.0",
+  "description": "Initial commit: Repo Initialization",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec \"ts-node src/index.ts\" --ext js,ts --watch src",
+    "build": "tsc",
+    "serve": "node build/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idrissjuanito/cmsmount.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/idrissjuanito/cmsmount/issues"
+  },
+  "homepage": "https://github.com/idrissjuanito/cmsmount#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

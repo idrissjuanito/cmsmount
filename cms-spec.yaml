@@ -189,6 +189,7 @@ paths:
         - applications
       summary: Gets all apps
       description: retrieve all apps in the system admin only
+      operationId: getAllApps
       responses:
         "200":
           description: sucessfull retrieval
@@ -210,6 +211,7 @@ paths:
         - applications
       summary: get single app
       description: retrives data on single app
+      operationId: getApp
       parameters:
         - $ref: "#/components/parameters/AppId"
       responses:
@@ -230,6 +232,7 @@ paths:
         - applications
       summary: update an application
       description: Updates a users application
+      operationId: updateApp
       parameters:
         - $ref: "#/components/parameters/AppId"
       responses:
@@ -250,6 +253,7 @@ paths:
         - applications
       summary: delete applicationn
       description: deletes a single app and all its associated keys
+      operationId: deleteApp
       parameters:
         - $ref: "#/components/parameters/AppId"
       responses:
@@ -295,6 +299,7 @@ paths:
         - posts
       summary: New Project
       description: adds a new project content for
+      operationId: createPost
       requestBody:
         required: true
         content:
@@ -376,6 +381,7 @@ paths:
         - posts
       summary: delete a post
       description: deletes a single blog post
+      operationId: deletePost
       parameters:
         - $ref: "#/components/schemas/Post"
       responses:
@@ -418,6 +424,7 @@ paths:
         - projects
       summary: New Project
       description: adds a new project content for
+      operationId: createProject
       requestBody:
         required: true
         content:
@@ -499,6 +506,7 @@ paths:
         - projects
       summary: delete a project
       description: deletes a single project
+      operationId: deleteProject
       parameters:
         - $ref: "#/components/schemas/Post"
       responses:
@@ -514,6 +522,7 @@ paths:
           description: Bad request
       security:
         - ApiKeyAuth: []
+
 components:
   schemas:
     User:

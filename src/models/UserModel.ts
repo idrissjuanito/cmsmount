@@ -1,4 +1,8 @@
 import { Schema, model } from "mongoose";
+import { inspect } from "util";
+import { validate } from "email-validator";
+import { Transform } from "stream";
+import bcrypt from "bcrypt";
 
 const UserSchema = new Schema(
   {
@@ -12,10 +16,20 @@ const UserSchema = new Schema(
       required: true,
       trim: true,
       unique: true,
+      validate: {
+        validator: validate,
+        message: (props) => {
+          return "Invalid email address";
+        },
+      },
     },
     password: {
       type: String,
       required: true,
+      transform: async (value: string) => {
+        const hashed = await bcrypt.hash(value, 10);
+        return hashed;
+      },
     },
   },
   { timestamps: true },

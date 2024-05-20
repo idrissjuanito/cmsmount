@@ -4,9 +4,9 @@ import { errorHandler } from "./middlewares";
 
 function createServer() {
   const app = express();
-  app.use("/api/v1", router);
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use("/api/v1", router);
   app.use(errorHandler);
   return app;
 }

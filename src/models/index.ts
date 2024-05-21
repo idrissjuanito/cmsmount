@@ -1,22 +1,18 @@
 import { Schema, model, ObjectId, Types } from "mongoose";
-import { IApp, IKey, IPost, IStack, ITag, ICategory } from "types";
+import { IApp, IApiKey, IPost, IStack, ITag, ICategory } from "types";
+export { default as PostModel } from "./PostModel";
+export { default as ProjectModel } from "./ProjectModel";
+export { default as UserModel } from "./UserModel";
 
 const appSchema = new Schema({
   name: String,
   userId: {
     type: Types.ObjectId,
     ref: "User",
+    require: true,
   },
-  keys: [{ type: Types.ObjectId, ref: "Key" }],
-});
-
-const keySchema = new Schema({
-  _id: String,
-  appId: { type: Types.ObjectId, ref: "Apps" },
-  status: {
-    type: String,
-    default: "Active",
-  },
+  keys: [String],
+  allowedDomains: [String],
 });
 
 const categorySchema = new Schema({
@@ -41,10 +37,9 @@ const stackSchema = new Schema({
   imageUrl: String,
 });
 
-const TagModel = model<ITag>("Tag", tagSchema);
-const CategoryModel = model<ICategory>("Category", categorySchema);
-const AppModel = model<IApp>("Apps", appSchema);
-const KeyModel = model<IKey>("Key", keySchema);
-const StackModel = model<IStack>("Stack", stackSchema);
+export const TagModel = model<ITag>("Tag", tagSchema);
+export const CategoryModel = model<ICategory>("Category", categorySchema);
+export const AppModel = model<IApp>("Apps", appSchema);
+export const StackModel = model<IStack>("Stack", stackSchema);
 
 export default AppModel;

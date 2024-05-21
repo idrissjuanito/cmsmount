@@ -1,4 +1,4 @@
-import UserModel from "../models/UserModel";
+import { UserModel } from "../models";
 import { Response, Request, NextFunction } from "express";
 import { ServerError, NotFoundError } from "../errors";
 

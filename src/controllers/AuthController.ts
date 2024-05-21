@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import UserModel from "../models/UserModel";
+import { UserModel } from "../models";
 import { BadRequestError, NotFoundError, ServerError } from "../errors";
 
 export const login = async (

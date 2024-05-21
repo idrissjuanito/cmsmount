@@ -11,6 +11,7 @@ interface IUserModel extends Model<IUser> {
     password: string,
   ): Promise<HydratedDocument<IUser>>;
 }
+
 const UserSchema = new Schema(
   {
     firstName: {

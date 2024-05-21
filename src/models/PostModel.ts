@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 const PostSchema = new Schema({
   title: {
@@ -6,7 +6,8 @@ const PostSchema = new Schema({
     required: true,
   },
   appId: {
-    type: String,
+    type: Types.ObjectId,
+    ref: "Apps",
     required: true,
   },
   body: String,
@@ -19,8 +20,8 @@ const PostSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  tags: [String],
-  categories: [String],
+  tags: [{ type: Types.ObjectId, ref: "Tag" }],
+  categories: [{ type: Types.ObjectId, ref: "Category" }],
 });
 
 const PostModel = model("Post", PostSchema);

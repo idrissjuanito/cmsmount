@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
+import { types } from "util";
 
 const ProjectSchema = new Schema({
   title: {
@@ -6,7 +7,8 @@ const ProjectSchema = new Schema({
     required: true,
   },
   appId: {
-    type: String,
+    type: Types.ObjectId,
+    ref: "Apps",
     required: true,
   },
   description: String,
@@ -15,7 +17,7 @@ const ProjectSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  stack: [String],
+  stack: [{ type: Types.ObjectId, ref: "Stack" }],
   link: String,
   repo: String,
 });

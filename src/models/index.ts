@@ -1,14 +1,18 @@
-import { Schema, model, ObjectId } from "mongoose";
+import { Schema, model, ObjectId, Types } from "mongoose";
+import { IApp, IKey, IPost, IStack, ITag, ICategory } from "types";
 
 const appSchema = new Schema({
   name: String,
-  userId: String,
-  keys: [String],
+  userId: {
+    type: Types.ObjectId,
+    ref: "User",
+  },
+  keys: [{ type: Types.ObjectId, ref: "Key" }],
 });
 
 const keySchema = new Schema({
   _id: String,
-  appId: { type: String },
+  appId: { type: Types.ObjectId, ref: "Apps" },
   status: {
     type: String,
     default: "Active",
@@ -32,9 +36,15 @@ const tagSchema = new Schema({
   },
 });
 
-const TagModel = model("Tag", tagSchema);
-const CategoryModel = model("Category", categorySchema);
-const AppModel = model("Apps", appSchema);
-const KeyModel = model("Key", keySchema);
+const stackSchema = new Schema({
+  name: String,
+  imageUrl: String,
+});
+
+const TagModel = model<ITag>("Tag", tagSchema);
+const CategoryModel = model<ICategory>("Category", categorySchema);
+const AppModel = model<IApp>("Apps", appSchema);
+const KeyModel = model<IKey>("Key", keySchema);
+const StackModel = model<IStack>("Stack", stackSchema);
 
 export default AppModel;

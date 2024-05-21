@@ -23,3 +23,11 @@ export const login = async (
     return next(new ServerError());
   }
 };
+
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  res.json({ message: "user logged out successfully" });
+};

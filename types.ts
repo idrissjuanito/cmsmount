@@ -13,9 +13,10 @@ export interface IApp {
   name: string;
   userId: Types.ObjectId;
   keys: Array<string>;
+  allowedDomains: Array<string>;
 }
 
-export interface IKey {
+export interface IApiKey {
   key: string;
   AppId: Types.ObjectId;
   status: "Active" | "Revoked";

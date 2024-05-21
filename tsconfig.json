@@ -4,11 +4,12 @@
     "moduleResolution": "nodenext",
     "outDir": "build",
     "forceConsistentCasingInFileNames": true,
-    //    "rootDir": "src",
+    "rootDir": "src",
+    "baseUrl": ".",
     "noImplicitAny": true,
     "strict": true,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "nodenext",
     "sourceMap": true
   },
   "include": ["./src/**/*.ts"]

@@ -22,7 +22,7 @@ export const getAllUsers = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const users = await UserModel.find();
+  const users = await UserModel.find({}, "-__v -createdAt -updatedAt");
   return res.json(users);
 };
 

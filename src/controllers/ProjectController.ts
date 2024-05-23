@@ -9,11 +9,10 @@ export const newProject = async (
   next: NextFunction,
 ) => {
   const { appId } = res.locals;
-  const projectId = new Types.ObjectId();
-  const newProject = new ProjectModel({ projectId, ...req.body, appId });
+  const newProject = new ProjectModel({ ...req.body, appId });
   try {
     await newProject.save();
-    return res.json({ message: "Project created successfully" });
+    return res.json({ projectId: newProject._id });
   } catch (error: any) {
     console.log(error?.message);
     next(new ServerError());
@@ -39,7 +38,7 @@ export const deleteProject = async (
   const { projectId } = req.params;
   try {
     const result = await ProjectModel.deleteOne({
-      $and: [{ projectId }, { appId }],
+      $and: [{ _id: projectId }, { appId }],
     });
     if (result.deletedCount < 1) return next(new NotFoundError("Project"));
     return res.json({ message: "delete success" });
@@ -55,14 +54,17 @@ export const getProject = async (
 ) => {
   const { projectId } = req.params;
   const { appId } = res.locals;
-  const user = await ProjectModel.findOne({
-    $and: [{ projectId }, { appId }],
-  })
+  const post = await ProjectModel.findOne(
+    {
+      $and: [{ _id: projectId }, { appId }],
+    },
+    "-__v -_v",
+  )
     .lean()
-    .populate("stacks", "-_id")
+    .populate("stack", "-_id")
     .exec();
-  if (!user) next(new NotFoundError("Project"));
-  return res.json(user);
+  if (!post) return next(new NotFoundError("Project"));
+  return res.json(post);
 };
 
 export const updateProject = async (
@@ -74,7 +76,7 @@ export const updateProject = async (
   const { appId } = res.locals;
   try {
     const result = await ProjectModel.updateOne(
-      { $and: [{ projectId }, { appId }] },
+      { $and: [{ _id: projectId }, { appId }] },
       req.body,
     );
     if (result.matchedCount < 1) return next(new NotFoundError("Project"));

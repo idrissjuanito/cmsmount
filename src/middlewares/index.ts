@@ -79,7 +79,7 @@ export const Auth = async (req: Request, res: Response, next: NextFunction) => {
       if (!user) return next(new NotFoundError("User"));
       res.locals.user = user;
     }
-    res.locals.app = app;
+    res.locals.appId = app?._id;
     next();
   } catch (err: any) {
     console.error(err.message);

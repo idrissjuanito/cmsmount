@@ -6,6 +6,7 @@ export interface IUser {
   lastName: string;
   email: string;
   password: string;
+  role: string;
 }
 
 export interface IApp {
@@ -60,4 +61,8 @@ export interface IProject {
   stacks: Array<Types.ObjectId>;
   link: string;
   repo: string;
+}
+
+export interface IBearerPayload {
+  userId: string;
 }

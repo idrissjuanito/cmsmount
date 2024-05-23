@@ -4,16 +4,19 @@ export { default as PostModel } from "./PostModel";
 export { default as ProjectModel } from "./ProjectModel";
 export { default as UserModel } from "./UserModel";
 
-const appSchema = new Schema({
-  name: String,
-  userId: {
-    type: Types.ObjectId,
-    ref: "User",
-    require: true,
+const appSchema = new Schema(
+  {
+    name: String,
+    userId: {
+      type: Types.ObjectId,
+      ref: "User",
+      require: true,
+    },
+    keys: [String],
+    allowedDomains: [String],
   },
-  keys: [String],
-  allowedDomains: [String],
-});
+  { timestamps: true },
+);
 
 const categorySchema = new Schema({
   name: {

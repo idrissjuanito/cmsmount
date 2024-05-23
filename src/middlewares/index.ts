@@ -20,6 +20,7 @@ export const errorHandler = (
   if (error instanceof CustomError) {
     return res.status(error.StatusCode).json(error.serialize());
   }
+  console.log(error);
   return res.status(500).json({ message: "Server Error" });
 };
 
@@ -73,12 +74,11 @@ export const Auth = async (req: Request, res: Response, next: NextFunction) => {
     if (userId) {
       user = await UserModel.findById(
         userId,
-        "-__v -_id -createdAt -password -updatedAt",
-      );
+        "-_id -__v -createdAt -password -updatedAt",
+      ).lean();
       if (!user) return next(new NotFoundError("User"));
       res.locals.user = user;
     }
-    console.log(userId);
     res.locals.app = app;
     next();
   } catch (err: any) {

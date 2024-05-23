@@ -1,6 +1,7 @@
 import { ProjectModel } from "../models";
 import { Request, Response, NextFunction } from "express";
 import { ServerError, NotFoundError } from "../errors";
+import { Types } from "mongoose";
 
 export const newProject = async (
   req: Request,
@@ -8,7 +9,8 @@ export const newProject = async (
   next: NextFunction,
 ) => {
   const { appId } = res.locals;
-  const newProject = new ProjectModel({ ...req.body, appId });
+  const projectId = new Types.ObjectId();
+  const newProject = new ProjectModel({ projectId, ...req.body, appId });
   try {
     await newProject.save();
     return res.json({ message: "Project created successfully" });
@@ -37,7 +39,7 @@ export const deleteProject = async (
   const { projectId } = req.params;
   try {
     const result = await ProjectModel.deleteOne({
-      $and: [{ _id: projectId }, { appId }],
+      $and: [{ projectId }, { appId }],
     });
     if (result.deletedCount < 1) return next(new NotFoundError("Project"));
     return res.json({ message: "delete success" });
@@ -54,7 +56,7 @@ export const getProject = async (
   const { projectId } = req.params;
   const { appId } = res.locals;
   const user = await ProjectModel.findOne({
-    $and: [{ _id: projectId }, { appId }],
+    $and: [{ projectId }, { appId }],
   })
     .lean()
     .populate("stacks", "-_id")
@@ -72,7 +74,7 @@ export const updateProject = async (
   const { appId } = res.locals;
   try {
     const result = await ProjectModel.updateOne(
-      { $and: [{ _id: projectId }, { appId }] },
+      { $and: [{ projectId }, { appId }] },
       req.body,
     );
     if (result.matchedCount < 1) return next(new NotFoundError("Project"));

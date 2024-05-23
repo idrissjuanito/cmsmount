@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from "express";
 import AppModel from "../models";
 import { ServerError, NotFoundError } from "../errors";
 import { Types } from "mongoose";
+import { generateApiKey, isValidApiKey } from "../services/keys.service";
 
 export const newApp = async (
   req: Request,
@@ -9,14 +10,20 @@ export const newApp = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = new Types.ObjectId();
-    const result = await AppModel.insertMany({
-      name: req.body.name,
+    const userId = res.locals.userId;
+    const { name, allowed } = req.body;
+
+    const appId = new Types.ObjectId();
+    const apiKey = await generateApiKey(appId.toString());
+    const newApp = new AppModel({
+      _id: appId,
       userId,
-      keys: [],
+      name,
+      keys: [apiKey],
+      allowedDomains: allowed,
     });
-    console.log(result);
-    return res.send("Insert was success");
+    newApp.save();
+    return res.json({ appId, apiKey });
   } catch (error) {
     console.log(error);
     return next(new ServerError());
@@ -29,7 +36,8 @@ export const getAllApps = async (
   next: NextFunction,
 ) => {
   try {
-    const apps = await AppModel.find({}, "-__V -createdAt -updatedAt");
+    const { userId } = res.locals;
+    const apps = await AppModel.find({ userId }, "-__v -createdAt -updatedAt");
     return res.json(apps);
   } catch (error) {
     console.log(error);
@@ -43,9 +51,14 @@ export const updateApp = async (
   next: NextFunction,
 ) => {
   const { appId } = req.params;
+  const { userId } = res.locals;
   try {
-    const result = await AppModel.updateOne({ _id: appId }, req.body);
-    if (result.matchedCount < 1) return next(new NotFoundError("App"));
+    const result = await AppModel.updateOne(
+      { $and: [{ _id: appId }, { userId }] },
+      req.body,
+    );
+    console.log(result);
+    if (result.modifiedCount < 1) return next(new NotFoundError("App"));
     return res.json({ message: "update successfull" });
   } catch (error) {
     console.error(error);
@@ -59,10 +72,14 @@ export const getApp = async (
   next: NextFunction,
 ) => {
   const { appId } = req.params;
+  const { userId } = res.locals;
   try {
-    const app = await AppModel.findOne({ _id: appId });
+    const app = await AppModel.findOne(
+      { $and: [{ _id: appId }, { userId }] },
+      "-__v -updatedAt -_id",
+    ).lean();
     if (!app) return next(new NotFoundError("App"));
-    return res.json(app);
+    return res.json({ ...app, appId });
   } catch (error) {
     console.log(error);
     return next(new ServerError());
@@ -75,6 +92,7 @@ export const deleteApp = async (
   next: NextFunction,
 ) => {
   const { appId } = req.params;
+  const { userId } = res.locals;
   try {
     const result = await AppModel.deleteOne({ _id: appId });
     if (result.deletedCount < 1) return next(new NotFoundError("App"));

@@ -37,7 +37,7 @@ export const deletePost = async (
   const { postId } = req.params;
   try {
     const result = await PostModel.deleteOne({
-      $and: [{ _id: postId }, { appId }],
+      $and: [{ postId: postId }, { appId }],
     });
     if (result.deletedCount < 1) return next(new NotFoundError("Post"));
     return res.json({ message: "delete success" });
@@ -53,7 +53,7 @@ export const getPost = async (
 ) => {
   const { postId } = req.params;
   const { appId } = res.locals;
-  const user = await PostModel.findOne({ $and: [{ _id: postId }, { appId }] })
+  const user = await PostModel.findOne({ $and: [{ postId }, { appId }] })
     .lean()
     .populate("categories", "name")
     .populate("tags", "name")
@@ -71,7 +71,7 @@ export const updatePost = async (
   const { appId } = res.locals;
   try {
     const result = await PostModel.updateOne(
-      { $and: [{ _id: postId }, { appId }] },
+      { $and: [{ postId }, { appId }] },
       req.body,
     );
     if (result.matchedCount < 1) return next(new NotFoundError("Post"));

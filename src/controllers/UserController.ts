@@ -2,15 +2,16 @@ import { UserModel } from "../models";
 import { Response, Request, NextFunction } from "express";
 import { UnauthorizedError, ServerError, NotFoundError } from "../errors";
 import { IUser } from "types";
+import { Types } from "mongoose";
 
 export const newUser = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const newUser = new UserModel(req.body).toObject();
+  const newUser = new UserModel(req.body);
   try {
-    await UserModel.create(newUser);
+    await newUser.save();
     return res.json({ message: "User created successfully" });
   } catch (error: any) {
     console.log(error?.message);
@@ -23,7 +24,7 @@ export const getUser = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { userId, user } = res.locals;
+  const { user, userId } = res.locals;
   return res.json({ userId, ...user });
 };
 
@@ -37,8 +38,7 @@ export const getAllUsers = async (
   if (user.role !== "Admin") return next(new UnauthorizedError());
   try {
     const users = await UserModel.aggregate([
-      { $addFields: { userId: "$_id" } },
-      { $unset: ["_id", "__v", "password"] },
+      { $unset: ["__v", "password"] },
     ]).exec();
     return res.json(users);
   } catch (error) {

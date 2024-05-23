@@ -11,7 +11,7 @@ export const newPost = async (
   const newPost = new PostModel({ ...req.body, appId });
   try {
     await newPost.save();
-    return res.json({ message: "Post created successfully" });
+    return res.json({ postId: newPost._id });
   } catch (error: any) {
     console.log(error?.message);
     next(new ServerError());
@@ -33,11 +33,11 @@ export const deletePost = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { appId } = res.locals;
   const { postId } = req.params;
+  const { appId } = res.locals;
   try {
     const result = await PostModel.deleteOne({
-      $and: [{ postId: postId }, { appId }],
+      $and: [{ _id: postId }, { appId }],
     });
     if (result.deletedCount < 1) return next(new NotFoundError("Post"));
     return res.json({ message: "delete success" });
@@ -53,13 +53,16 @@ export const getPost = async (
 ) => {
   const { postId } = req.params;
   const { appId } = res.locals;
-  const user = await PostModel.findOne({ $and: [{ postId }, { appId }] })
+  const post = await PostModel.findOne(
+    { $and: [{ _id: postId }, { appId }] },
+    "-__v -_id",
+  )
     .lean()
     .populate("categories", "name")
     .populate("tags", "name")
     .exec();
-  if (!user) next(new NotFoundError("Post"));
-  return res.json(user);
+  if (!post) return next(new NotFoundError("Post"));
+  return res.json({ ...post, postId });
 };
 
 export const updatePost = async (
@@ -71,7 +74,7 @@ export const updatePost = async (
   const { appId } = res.locals;
   try {
     const result = await PostModel.updateOne(
-      { $and: [{ postId }, { appId }] },
+      { $and: [{ _id: postId }, { appId }] },
       req.body,
     );
     if (result.matchedCount < 1) return next(new NotFoundError("Post"));

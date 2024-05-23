@@ -2,7 +2,6 @@ import { Schema, Types, model } from "mongoose";
 
 const PostSchema = new Schema(
   {
-    postId: Types.ObjectId,
     title: {
       type: String,
       required: true,
@@ -22,10 +21,13 @@ const PostSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    tags: [{ type: Types.ObjectId, ref: "Tag" }],
-    categories: [{ type: Types.ObjectId, ref: "Category" }],
+    tags: { type: [{ type: Types.ObjectId, ref: "Tag" }], default: [] },
+    categories: {
+      type: [{ type: Types.ObjectId, ref: "Category" }],
+      default: [],
+    },
   },
-  { timestamps: true, _id: false },
+  { timestamps: true },
 );
 
 const PostModel = model("Post", PostSchema);

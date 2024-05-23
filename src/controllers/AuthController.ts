@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { UserModel } from "../models";
 import { BadRequestError, NotFoundError, ServerError } from "../errors";
+import jwt from "jsonwebtoken";
+import config from "../config";
 
 export const login = async (
   req: Request,
@@ -15,11 +17,14 @@ export const login = async (
   ).toString("utf-8");
   const [email, password] = credentials.split(":");
   try {
-    const user = await UserModel.comparePassword(email, password);
+    const user = await UserModel.findComparePassword(email, password);
     if (!user) return next(new NotFoundError("User"));
-    return res.json({ email: user.email });
-    // return res.send("processing");
+    const token = jwt.sign({ userId: user.id }, config.secret, {
+      expiresIn: 60 * 60,
+    });
+    return res.json({ email: user.email, token });
   } catch (error) {
+    console.log(error);
     return next(new ServerError());
   }
 };

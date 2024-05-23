@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 import { IUser } from "types";
 
 interface IUserModel extends Model<IUser> {
-  comparePassword(
+  findComparePassword(
     email: string,
     password: string,
   ): Promise<HydratedDocument<IUser>>;
@@ -35,6 +35,11 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ["admin", "editor"],
+      default: "editor",
+    },
   },
   { timestamps: true },
 );
@@ -45,7 +50,7 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-UserSchema.statics.comparePassword = async function (email, password) {
+UserSchema.statics.findComparePassword = async function (email, password) {
   try {
     const user = await this.findOne({ email: email });
     const match = await bcrypt.compare(password, user.password);

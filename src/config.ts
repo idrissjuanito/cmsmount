@@ -16,7 +16,7 @@ const config = {
     secret,
   },
   test: {
-    mongoUrl: "mongodb://localhost:27017",
+    mongoUrl: "mongodb://localhost:27017/test_cmsmount",
     secret,
   },
 };

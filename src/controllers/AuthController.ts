@@ -10,7 +10,7 @@ export const login = async (
   next: NextFunction,
 ) => {
   const base64Header = req.get("Authorization");
-  if (!base64Header) return next(new BadRequestError("credentials"));
+  if (!base64Header) return next(new BadRequestError("Missing credentials"));
   const credentials = Buffer.from(
     base64Header.split(" ")[1],
     "base64",

@@ -1,21 +1,33 @@
 import { UserModel } from "../models";
 import { Response, Request, NextFunction } from "express";
-import { UnauthorizedError, ServerError, NotFoundError } from "../errors";
+import {
+  BadRequestError,
+  UnauthorizedError,
+  ServerError,
+  NotFoundError,
+} from "../errors";
 import { IUser } from "types";
-import { Types } from "mongoose";
+import { Types, Error } from "mongoose";
 
 export const newUser = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const newUser = new UserModel(req.body);
   try {
+    const newUser = new UserModel(req.body);
+    console.log("creatig new user");
+    await newUser.validateSync();
     await newUser.save();
-    return res.json({ message: "User created successfully" });
+    return res.json({ userId: newUser._id, email: newUser.email });
   } catch (error: any) {
-    console.log(error?.message);
-    next(new ServerError());
+    console.log(error.message);
+    if (error instanceof Error.ValidationError) {
+      return next(new BadRequestError("Invalid request data"));
+    }
+    if (error.message.includes("duplicate"))
+      return next(new BadRequestError("Account already exists with email"));
+    return next(new ServerError());
   }
 };
 

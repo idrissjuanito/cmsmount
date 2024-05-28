@@ -3,7 +3,7 @@ export default abstract class CustomError extends Error {
     super();
   }
   abstract StatusCode: number;
-  abstract serialize(): { message: string };
+  abstract serialize(): { error: string };
 }
 
 class NotFoundError extends CustomError {
@@ -12,7 +12,7 @@ class NotFoundError extends CustomError {
   }
   StatusCode = 404;
   serialize() {
-    return { message: `${this.resource} not found` };
+    return { error: `${this.resource} not found` };
   }
 }
 
@@ -22,7 +22,7 @@ class ServerError extends CustomError {
   }
   StatusCode = 500;
   serialize() {
-    return { message: "Something went wrong on server" };
+    return { error: "Something went wrong on server" };
   }
 }
 
@@ -32,7 +32,7 @@ class UnauthorizedError extends CustomError {
   }
   StatusCode = 401;
   serialize() {
-    return { message: "Access unauthorized" };
+    return { error: "Access unauthorized" };
   }
 }
 
@@ -40,9 +40,9 @@ class BadRequestError extends CustomError {
   constructor(public missing: string) {
     super();
   }
-  StatusCode = 401;
+  StatusCode = 400;
   serialize() {
-    return { message: `Bad request: Missing ${this.missing}` };
+    return { error: `Bad request: ${this.missing}` };
   }
 }
 

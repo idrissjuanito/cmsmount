@@ -21,9 +21,9 @@ const UserSchema = new Schema(
     lastName: String,
     email: {
       type: String,
+      unique: true,
       required: true,
       trim: true,
-      unique: true,
       validate: {
         validator: validate,
         message: (props) => {

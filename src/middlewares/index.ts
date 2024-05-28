@@ -21,7 +21,7 @@ export const errorHandler = (
     return res.status(error.StatusCode).json(error.serialize());
   }
   console.log(error);
-  return res.status(500).json({ message: "Server Error" });
+  return res.status(500).json({ error: "Server Error" });
 };
 
 export const BearerAuth = async (
@@ -32,7 +32,7 @@ export const BearerAuth = async (
   const bearerHeader = req.get("Authorization");
   if (!bearerHeader) return next();
   const [bearer, jsonwt] = bearerHeader.split(" ");
-  if (bearer !== "Bearer") return next(new BadRequestError("Token"));
+  if (bearer !== "Bearer") return next(new BadRequestError("Missing Token"));
   try {
     const decoded = (await jwt.verify(jsonwt, config.secret)) as IBearerPayload;
     if (!decoded) return next(new UnauthorizedError());

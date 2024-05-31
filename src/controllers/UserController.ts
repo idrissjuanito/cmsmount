@@ -46,7 +46,6 @@ export const getAllUsers = async (
   next: NextFunction,
 ) => {
   const { user } = res.locals;
-  console.log(user);
   if (user.role !== "Admin") return next(new UnauthorizedError());
   try {
     const users = await UserModel.aggregate([

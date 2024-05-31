@@ -3,6 +3,7 @@ import { UserModel } from "../models";
 import { BadRequestError, NotFoundError, ServerError } from "../errors";
 import jwt from "jsonwebtoken";
 import config from "../config";
+import redisClient from "../services/redis.service";
 
 export const login = async (
   req: Request,
@@ -22,6 +23,7 @@ export const login = async (
     const token = jwt.sign({ userId: user.id }, config.secret, {
       expiresIn: 60 * 60,
     });
+    redisClient?.set(token, user._id.toString());
     return res.json({ email: user.email, token });
   } catch (error) {
     console.log(error);

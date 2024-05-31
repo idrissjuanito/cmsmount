@@ -1,4 +1,4 @@
-# CMSMount Headless cms api
+# Headless cms api
 
 CMSMounst is a headless cms api that gives frontend developers a central backend for managing
 content for multiple frontend apps. It exposes endpoinds for performing crud operations for possible content types on a system.
@@ -12,8 +12,21 @@ Users can register an app on the system and get an api key for the app, which th
 
 ## Run project
 
-- DEV: npm start
-- BUILD: npm run build
+### Development
+
+```
+NODE_ENV=development npm start
+```
+
+The environment variable will trigger using the local installation of mongodb
+
+### Production
+
+```
+NODE_ENV=production
+```
+
+production environment uses mongo atlas which is cloud based version of mongo db
 
 ## Endpoints
 
@@ -21,11 +34,11 @@ Users can register an app on the system and get an api key for the app, which th
 
 ### USERS
 
-- Post /registration: User registration on the system
-- Get /login: Obtain a session/access token for system operations
-- Get /users: Admin only endpoints for retrieving all users in the system
-- Get /users/logout: destroy session
-- Get /account: gets a users account data
+- POST /registration: User registration on the system
+- GET /login: Obtain a session/access token for system operations
+- GET /users: Admin only endpoints for retrieving all users in the system
+- GET /users/logout: destroy session
+- GET /account: gets a users account data
 - PUT /account: update a user
 - DELETE /account: delete a user account
 

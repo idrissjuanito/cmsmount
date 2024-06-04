@@ -67,3 +67,5 @@ DELETE /content/projects/{projectId}: deletes a single projects
 
 - stacks
 - categories
+
+[Open API documentation](https://app.swaggerhub.com/apis/Projuanito/CMSMount/0.1)

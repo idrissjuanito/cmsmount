@@ -23,7 +23,9 @@ The environment variable will trigger using the local installation of mongodb
 ### Production
 
 ```
-NODE_ENV=production
+npm run build
+
+npm run serve
 ```
 
 production environment uses mongo atlas which is cloud based version of mongo db

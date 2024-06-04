@@ -14,7 +14,7 @@ export const newPost = async (
     return res.json({ postId: newPost._id });
   } catch (error: any) {
     console.log(error?.message);
-    next(new ServerError());
+    return next(new ServerError());
   }
 };
 
@@ -40,7 +40,7 @@ export const deletePost = async (
       $and: [{ _id: postId }, { appId }],
     });
     if (result.deletedCount < 1) return next(new NotFoundError("Post"));
-    return res.json({ message: "delete success" });
+    return res.json({ message: "Delete successfull" });
   } catch (error) {
     next(new ServerError());
   }

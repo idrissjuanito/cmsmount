@@ -16,7 +16,6 @@ export const newUser = async (
 ) => {
   try {
     const newUser = new UserModel(req.body);
-    console.log("creatig new user");
     await newUser.validateSync();
     await newUser.save();
     return res.json({ userId: newUser._id, email: newUser.email });

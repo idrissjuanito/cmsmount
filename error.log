@@ -1,0 +1,7 @@
+{"level":"error","message":{"StatusCode":401}}
+{"level":"error","message":{"StatusCode":401}}
+{"level":"error","message":"401 [object Object]"}
+{"level":"error","message":"401 Access unauthorized"}
+{"level":"error","message":"GET /api/v1/users/account 401 Access unauthorized"}
+2024-06-05T11:40:36.686Z error: GET /api/v1/users/account 401 Access unauthorized
+2024-06-05T11:42:01.051Z error: GET /api/v1/users/account 401 Access unauthorized

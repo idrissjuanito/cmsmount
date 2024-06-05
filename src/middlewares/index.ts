@@ -9,7 +9,7 @@ import { IBearerPayload } from "types";
 import { UserModel, AppModel } from "../models";
 import CustomError from "../errors";
 import jwt from "jsonwebtoken";
-import config from "../config";
+import config, { logger } from "../config";
 
 export const errorHandler = (
   error: Error | CustomError,
@@ -18,9 +18,11 @@ export const errorHandler = (
   next: NextFunction,
 ) => {
   if (error instanceof CustomError) {
+    logger.error(
+      `${req.method} ${req.url} ${error.StatusCode} ${error.serialize().error}`,
+    );
     return res.status(error.StatusCode).json(error.serialize());
   }
-  console.log(error);
   return res.status(500).json({ error: "Server Error" });
 };
 
@@ -39,7 +41,7 @@ export const BearerAuth = async (
     res.locals.userId = decoded.userId;
     next();
   } catch (err: any) {
-    console.error(err.message);
+    logger.error(err.message);
     if (err?.name === "TokenExpiredError") return next(new UnauthorizedError());
     return next(new ServerError());
   }
@@ -87,7 +89,8 @@ export const Auth = async (req: Request, res: Response, next: NextFunction) => {
       res.locals.user = user;
     }
     res.locals.appId = app?._id;
-    next();
+    logger.info(req.method, req.url);
+    return next();
   } catch (err: any) {
     console.error(err.message);
     if (err?.name === "TokenExpiredError") return next(new UnauthorizedError());

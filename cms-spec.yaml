@@ -8,6 +8,9 @@ info:
     domains for which it wants to manage content
   version: "0.1"
 servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Projuanito/CMSMount/0.1
   - url: api.cmsmount.co/v1
 tags:
   - name: users
@@ -19,7 +22,7 @@ tags:
   - name: applications
     description: application/projects a user intends to use api on
 paths:
-  /users/registration:
+  /registration:
     post:
       tags:
         - users
@@ -60,7 +63,7 @@ paths:
                     type: string
         "400":
           $ref: "#/components/responses/BadRequest"
-  /users/login:
+  /login:
     get:
       tags:
         - users
@@ -85,6 +88,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFoundError"
+      security:
+        - BasicAuth: []
   /users/logout:
     get:
       tags:
@@ -127,15 +132,13 @@ paths:
           description: Bad request from client
       security:
         - BearerAuth: []
-  /users/{userId}:
+  /users/account:
     get:
       tags:
         - users
       summary: gets a single users basic info
       description: Get's basic information about a user
       operationId: getUser
-      parameters:
-        - $ref: "#/components/parameters/UserId"
       responses:
         "200":
           description: user found and info well retrieved
@@ -153,8 +156,6 @@ paths:
       summary: Update user
       description: This can only be done by the logged in user.
       operationId: updateUser
-      parameters:
-        - $ref: "#/components/parameters/UserId"
       requestBody:
         description: Update an existent user in the store
         content:
@@ -172,8 +173,6 @@ paths:
       summary: Delete user
       description: This can only be done by the logged in user.
       operationId: deleteUser
-      parameters:
-        - $ref: "#/components/parameters/UserId"
       responses:
         "400":
           description: Invalid username supplied
@@ -199,6 +198,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/App"
+        "401":
+          description: Unauthorized access
+        "400":
+          description: bad request
+      security:
+        - BearerAuth: []
+    post:
+      tags:
+        - applications
+      summary: New App
+      description: creates a new app for user from bearer token
+      operationId: newApp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/App"
+      responses:
+        "200":
+          description: successfull added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
         "401":
           description: Unauthorized access
         "400":
@@ -383,7 +406,7 @@ paths:
       description: deletes a single blog post
       operationId: deletePost
       parameters:
-        - $ref: "#/components/schemas/Post"
+        - $ref: "#/components/parameters/PostId"
       responses:
         "200":
           description: successfully deleted
@@ -449,7 +472,7 @@ paths:
           description: Bad request missing required data
       security:
         - ApiKeyAuth: []
-  /content/projects/{postId}:
+  /content/projects/{projectId}:
     get:
       tags:
         - projects
@@ -508,7 +531,7 @@ paths:
       description: deletes a single project
       operationId: deleteProject
       parameters:
-        - $ref: "#/components/schemas/Post"
+        - $ref: "#/components/parameters/PostId"
       responses:
         "200":
           description: successfully deleted
@@ -576,7 +599,7 @@ components:
     Project:
       type: object
       properties:
-        id:
+        projectId:
           type: string
         appId:
           type: string
@@ -589,6 +612,10 @@ components:
           type: string
         featured:
           type: boolean
+        link:
+          type: string
+        repo:
+          type: string
         stack:
           type: array
           items:
@@ -599,23 +626,13 @@ components:
         appId:
           type: string
           format: uuid
+        name:
+          type: string
         keys:
           type: array
           items:
-            $ref: "#/components/schemas/ApiKey"
+            type: string
         userId:
-          type: string
-          format: uuid
-    ApiKey:
-      type: object
-      properties:
-        key:
-          type: string
-        status:
-          enum:
-            - active
-            - revoked
-        appId:
           type: string
           format: uuid
 

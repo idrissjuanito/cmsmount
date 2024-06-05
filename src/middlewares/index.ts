@@ -53,14 +53,20 @@ export const ApiKeyAuth = async (
   const apiKey = req.get("X-API-KEY");
   if (!apiKey) return next();
   res.locals.apiKey = apiKey;
-  next();
+  console.log(apiKey);
+  return next();
 };
 
 export const Auth = async (req: Request, res: Response, next: NextFunction) => {
   // checks if any form of auth has been set
   // will then fetch apps associated with the user or key authenticated
-  const { apiKey, userId } = res.locals;
-  if (!apiKey && !userId) return next(new UnauthorizedError());
+  const { userId } = res.locals;
+  let apiKey = null;
+  if (!userId) {
+    apiKey = req.get("X-API-KEY");
+    if (!apiKey) return next(new UnauthorizedError());
+  }
+
   try {
     const app = await AppModel.findOne({
       $or: [{ keys: { $elemMatch: { $eq: apiKey } } }, { userId: userId }],

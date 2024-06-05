@@ -12,6 +12,9 @@ import { login } from "../controllers/AuthController";
 // main router
 const router = Router();
 
+router.get("/", (req: Request, res: Response) => {
+  res.json({ status: "Normal" });
+});
 router.post("/registration", newUser);
 router.get("/login", login);
 
@@ -25,10 +28,6 @@ router.use("/apps", appRouter);
 
 router.use("/content/posts", postsRouter);
 router.use("/content/projects", projectsRouter);
-
-router.get("/", (req: Request, res: Response) => {
-  res.json({ status: "All systems" });
-});
 
 router.get("*", (req: Request, res: Response) => {
   throw new NotFoundError("Route");

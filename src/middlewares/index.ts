@@ -65,6 +65,7 @@ export const Auth = async (req: Request, res: Response, next: NextFunction) => {
   if (!userId) {
     apiKey = req.get("X-API-KEY");
     if (!apiKey) return next(new UnauthorizedError());
+    if (req.method != "GET") return next(new UnauthorizedError());
   }
 
   try {
